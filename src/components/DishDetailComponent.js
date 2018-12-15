@@ -13,17 +13,16 @@ class CommentForm extends Component {
       isModalOpen: false
     };
     this.toggleModal = this.toggleModal.bind(this);
-    this.handleComment = this.handleComment.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleSubmit(values) {
-    console.log("Current State is: " + JSON.stringify(values));
-    alert("Current State is: " + JSON.stringify(values));
-  }
-
-  handleComment(event) {
     this.toggleModal();
-    alert("Username: " + this.username.value + " Password: " + this.password.value + " Remember: " + this.remember.checked);
+    this.props.addComment(
+      this.props.dishId, 
+      values.rating, 
+      values.author, 
+      values.comment);
   }
   
   toggleModal() {
@@ -55,9 +54,9 @@ class CommentForm extends Component {
                 </Col>
               </Row>
               <Row className="form-group">
-                <Label htmlFor="name" md={2}>Your Name</Label>
+                <Label htmlFor="author" md={2}>Your Name</Label>
                 <Col md={10}>
-                  <Control.text model=".name" id="name" name="name" placeholder="Your Name" 
+                  <Control.text model=".author" id="author" name="author" placeholder="Your Name" 
                   className="form-control" 
                   validators={{
                     minLength: minLength(3),
@@ -75,9 +74,9 @@ class CommentForm extends Component {
                 </Col>
               </Row>
               <Row className="form-group">
-                <Label htmlFor="message" md={2}>Comment</Label>
+                <Label htmlFor="comment" md={2}>Comment</Label>
                 <Col md={10}>
-                <Control.textarea model=".message" id="message" name="message" rows="6" className="form-control">
+                <Control.textarea model=".comment" id="comment" name="comment" rows="6" className="form-control">
                 </Control.textarea>
                 </Col>
               </Row>
@@ -108,7 +107,7 @@ function RenderDish({dish}) {
   );
 }
 
-function RenderComments({comments}) {
+function RenderComments({comments, addComment, dishId}) {
   if (comments != null) {
     const commentList = comments.map(com => {
       return (
@@ -128,7 +127,7 @@ function RenderComments({comments}) {
           {commentList}
         </ul>
         <div>
-          <CommentForm />
+          <CommentForm dishId={dishId} addComment={addComment}/>
         </div>
       </div>
     );
@@ -164,7 +163,10 @@ const DishDetail = (props) => {
               <RenderDish dish={props.dish} />
             </div>
             <div className="col-12 col-md-5 m-1">
-              <RenderComments comments={props.comments} />
+              <RenderComments 
+                comments={props.comments} 
+                addComment={props.addComment} 
+                dishId={props.dish.id} />
             </div>
           </div>
         </div>
