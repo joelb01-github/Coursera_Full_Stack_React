@@ -65,7 +65,7 @@ class CommentForm extends Component {
                   }}/>
                   <Errors
                     className="text-danger"
-                    model=".name"
+                    model=".author"
                     show="touched"
                     messages={{
                       minLength: 'Must be greater than 2 characters',
