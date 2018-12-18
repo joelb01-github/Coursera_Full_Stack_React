@@ -3,7 +3,6 @@ import { Card, CardImg, CardText, CardBody, CardTitle, Breadcrumb, BreadcrumbIte
 import { Link } from 'react-router-dom';
 import { Control, LocalForm, Errors } from 'react-redux-form';
 import { Loading } from './LoadingComponent';
-import { baseUrl } from '../shared/baseURL';
 import { FadeTransform, Fade, Stagger } from 'react-animation-components';
 
 const maxLength = (length) => (value) => !(value) || (value.length <= length);
@@ -105,7 +104,7 @@ function RenderDish({dish}) {
         exitTransform: 'scale(0.5) translateY(-50%)'
       }}>
       <Card>
-        <CardImg width="100%" src={baseUrl + dish.image} alt={dish.name} />
+        <CardImg width="100%" src={dish.image} alt={dish.name} />
         <CardBody>
           <CardTitle heading>{dish.name}</CardTitle>
           <CardText>{dish.description}</CardText>

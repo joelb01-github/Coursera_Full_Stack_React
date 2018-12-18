@@ -1,7 +1,13 @@
 import * as ActionTypes from './ActionTypes';
 import { baseUrl } from '../shared/baseURL';
+import { database } from '../firebase/firebase';
 
-/* Feedback */
+
+/*****************
+*     Feedback   *
+******************/
+
+// TODO: modify to firebase
 export const postFeedback = (feedback) => (dispatch) => {
 
   feedback.date = new Date().toISOString();
@@ -36,12 +42,17 @@ export const postFeedback = (feedback) => (dispatch) => {
   });
 };
 
-/* Comments */
+/*****************
+*     Comments   *
+******************/
+
+// TODO: modify to firebase
 export const addComment = (comment) => ({
   type: ActionTypes.ADD_COMMENT,
   payload: comment
 });
 
+// TODO: modify to firebase
 export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
   const newComment = {
@@ -83,23 +94,10 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
 };
 
+// Modified
 export const fetchComments = () => (dispatch) => {
-  return fetch(baseUrl + 'comments')
-    .then(response => {
-      if (response.ok) {
-        return response;
-      }
-      else {
-        var error = new Error('Error ' + response.status + ': ' + response.statusText);
-        error.response = response;
-        throw error;
-      }
-    }, error => {
-      var errmess = new Error(error.message);
-      throw errmess;
-    })
-    .then(response => response.json())
-    .then(comments => dispatch(addComments(comments)))
+  return database.ref('/comments').once('value')
+    .then(comments => dispatch(addComments(comments.val())))
     .catch(error => dispatch(commentsFailed(error.message)));
 };
 
@@ -113,26 +111,16 @@ export const addComments = (comments) => ({
   payload: comments
 });
 
-/* Dishes */
+/******************
+*     Dishes      *
+******************/
+
+// Modified
 export const fetchDishes = () => (dispatch) => {
   dispatch(dishesLoading(true));
 
-  return fetch(baseUrl + 'dishes')
-    .then(response => {
-      if (response.ok) {
-        return response;
-      }
-      else {
-        var error = new Error('Error ' + response.status + ': ' + response.statusText);
-        error.response = response;
-        throw error;
-      }
-    }, error => {
-      var errmess = new Error(error.message);
-      throw errmess;
-    })
-    .then(response => response.json())
-    .then(dishes => dispatch(addDishes(dishes)))
+  return database.ref('/dishes').once('value')
+    .then(dishes => dispatch(addDishes(dishes.val())))
     .catch(error => dispatch(dishesFailed(error.message)));
 };
 
@@ -150,26 +138,14 @@ export const addDishes = (dishes) => ({
   payload: dishes
 });
 
-/* Promotions */
+/******************
+*    Promotions   *
+******************/
 export const fetchPromos = () => (dispatch) => {
   dispatch(promosLoading(true));
 
-  return fetch(baseUrl + 'promotions')
-    .then(response => {
-      if (response.ok) {
-        return response;
-      }
-      else {
-        var error = new Error('Error ' + response.status + ': ' + response.statusText);
-        error.response = response;
-        throw error;
-      }
-    }, error => {
-      var errmess = new Error(error.message);
-      throw errmess;
-    })
-    .then(response => response.json())
-    .then(promotions => dispatch(addPromos(promotions)))
+  return database.ref('/promotions').once('value')
+    .then(promotions => dispatch(addPromos(promotions.val())))
     .catch(error => dispatch(promosFailed(error.message)));
 };
 
@@ -187,26 +163,14 @@ export const addPromos = (promotions) => ({
   payload: promotions
 });
 
-/* Leaders */
+/******************
+*    Leaders      *
+******************/
 export const fetchLeaders = () => (dispatch) => {
   dispatch(leadersLoading(true));
 
-  return fetch(baseUrl + 'leaders')
-    .then(response => {
-      if (response.ok) {
-        return response;
-      }
-      else {
-        var error = new Error('Error ' + response.status + ': ' + response.statusText);
-        error.response = response;
-        throw error;
-      }
-    }, error => {
-      var errmess = new Error(error.message);
-      throw errmess;
-    })
-    .then(response => response.json())
-    .then(leaders => dispatch(addLeaders(leaders)))
+  return database.ref('/leaders').once('value')
+    .then(leaders => dispatch(addLeaders(leaders.val())))
     .catch(error => dispatch(leadersFailed(error.message)));
 };
 
