@@ -7,38 +7,18 @@ import { database } from '../firebase/firebase';
 *     Feedback   *
 ******************/
 
-// TODO: modify to firebase
 export const postFeedback = (feedback) => (dispatch) => {
 
   feedback.date = new Date().toISOString();
 
-  return fetch(baseUrl + 'feedback', {
-    method: 'POST',
-    body: JSON.stringify(feedback),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'same-origin'
-  })
-  .then(response => {
-    if (response.ok) {
-      return response;
-    }
-    else {
-      var error = new Error('Error ' + response.status + ': ' + response.statusText);
-      error.response = response;
-      throw error;
-    }
-  }, error => {
-    var errmess = new Error(error.message);
-    throw errmess;
-  })
-  .then(response => {
+  return database.ref('/feedback').push().set(feedback) 
+  .then(() => {
+    console.log("Feedback successfully posted");
     alert('Your feedback has been posted');
   })
   .catch(error => { 
-    console.log('Post feedback ', error.message);
-    alert('Your feedback could not be posted\nError: ' + error.message);
+    console.log("Error: feedback couldn't be posted");
+    alert('Your feedback could not be posted\nError: ');
   });
 };
 
@@ -46,13 +26,11 @@ export const postFeedback = (feedback) => (dispatch) => {
 *     Comments   *
 ******************/
 
-// TODO: modify to firebase
 export const addComment = (comment) => ({
   type: ActionTypes.ADD_COMMENT,
   payload: comment
 });
 
-// TODO: modify to firebase
 export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
   const newComment = {
@@ -64,37 +42,20 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
   newComment.date = new Date().toISOString();
 
-  return fetch(baseUrl + 'comments', {
-    method: 'POST',
-    body: JSON.stringify(newComment),
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    credentials: 'same-origin'
-  })
-  .then(response => {
-    if (response.ok) {
-      return response;
-    }
-    else {
-      var error = new Error('Error ' + response.status + ': ' + response.statusText);
-      error.response = response;
-      throw error;
-    }
-  }, error => {
-    var errmess = new Error(error.message);
-    throw errmess;
-  })
-  .then(response => response.json())
-  .then(response => dispatch(addComment(response)))
-  .catch(error => { 
-    console.log('Post comments ',error.message);
-    alert('Your comment could not be posted\nError: ' + error.message);
-  });
+  return database.ref('/comments').push()
+  .then(ref => {
+    newComment.id = ref.key;
 
+    return ref.set(newComment)
+    .then(() => ref.once("value"))
+    .then((comment) => dispatch(addComment(comment.val())))
+    .catch(error => { 
+      console.log('Post comments ',error.message);
+      alert('Your comment could not be posted\nError: ' + error.message);
+    });
+  });
 };
 
-// Modified
 export const fetchComments = () => (dispatch) => {
   return database.ref('/comments').once('value')
     .then(comments => dispatch(addComments(comments.val())))
@@ -115,7 +76,6 @@ export const addComments = (comments) => ({
 *     Dishes      *
 ******************/
 
-// Modified
 export const fetchDishes = () => (dispatch) => {
   dispatch(dishesLoading(true));
 
