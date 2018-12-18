@@ -41,10 +41,10 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
   newComment.date = new Date().toISOString();
 
+  console.log(newComment);
+
   return database.ref('/comments').push()
   .then(ref => {
-    newComment.id = ref.key;
-
     return ref.set(newComment)
     .then(() => ref.once("value"))
     .then((comment) => dispatch(addComment(comment.val())))
@@ -57,7 +57,15 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
 export const fetchComments = () => (dispatch) => {
   return database.ref('/comments').once('value')
-    .then(comments => dispatch(addComments(comments.val())))
+    .then(snapshot => {
+      let comments = [];
+      snapshot.forEach((childSnapshot) => {
+        const data = childSnapshot.val();
+        const _id = childSnapshot.key;
+        comments.push({_id, ...data });
+      });
+      return dispatch(addComments(comments));
+    })
     .catch(error => dispatch(commentsFailed(error.message)));
 };
 
