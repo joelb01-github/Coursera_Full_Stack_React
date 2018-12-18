@@ -25,11 +25,6 @@ export const postFeedback = (feedback) => (dispatch) => {
 *     Comments   *
 ******************/
 
-export const addComment = (comment) => ({
-  type: ActionTypes.ADD_COMMENT,
-  payload: comment
-});
-
 export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
   const newComment = {
@@ -41,9 +36,7 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 
   newComment.date = new Date().toISOString();
 
-  console.log(newComment);
-
-  return database.ref('/comments').push()
+  return database.ref('comments').push()
   .then(ref => {
     return ref.set(newComment)
     .then(() => ref.once("value"))
@@ -56,27 +49,34 @@ export const postComment = (dishId, rating, author, comment) => (dispatch) => {
 };
 
 export const fetchComments = () => (dispatch) => {
-  return database.ref('/comments').once('value')
+  return database.ref('comments').once('value')
     .then(snapshot => {
       let comments = [];
       snapshot.forEach((childSnapshot) => {
-        const data = childSnapshot.val();
-        const _id = childSnapshot.key;
-        comments.push({_id, ...data });
+        // const data = childSnapshot.val();
+        // const _id = childSnapshot.key;
+        // comments.push({_id, ...data });
+        comments.push(childSnapshot.val());
       });
-      return dispatch(addComments(comments));
+      return comments;
     })
+    .then(comments => dispatch(addComments(comments)))
     .catch(error => dispatch(commentsFailed(error.message)));
 };
-
-export const commentsFailed = (errmess) => ({
-  type: ActionTypes.COMMENTS_FAILED,
-  payload: errmess
-});
 
 export const addComments = (comments) => ({
   type: ActionTypes.ADD_COMMENTS,
   payload: comments
+});
+
+export const addComment = (comment) => ({
+  type: ActionTypes.ADD_COMMENT,
+  payload: comment
+});
+
+export const commentsFailed = (errmess) => ({
+  type: ActionTypes.COMMENTS_FAILED,
+  payload: errmess
 });
 
 /******************
