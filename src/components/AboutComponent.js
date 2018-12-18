@@ -2,6 +2,7 @@ import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardHeader, Media } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { baseUrl } from '../shared/baseURL';
+import { Fade, Stagger } from 'react-animation-components';
 
 function RenderLeader({leader}) {
   return (
@@ -21,12 +22,6 @@ function RenderLeader({leader}) {
 }
 
 function About(props) {
-
-    const leaders = props.leaders.leaders.map((leader) => {
-        return (
-            <RenderLeader leader={leader} />
-        );
-    });
 
     return(
         <div className="container">
@@ -84,7 +79,15 @@ function About(props) {
                 </div>
                 <div className="col-12">
                     <Media list>
-                        {leaders}
+                      <Stagger in>
+                        {props.leaders.leaders.map((leader) => {
+                          return (
+                            <Fade in>
+                              <RenderLeader leader={leader} />
+                            </Fade>
+                          );
+                        })}
+                      </Stagger>
                     </Media>
                 </div>
             </div>
